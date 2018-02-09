@@ -18,7 +18,7 @@ HypothesesPrior <-
 # Ratio for discounting value of next round payoffs
 FutureDiscountRatio <- b <- 0.99
 # Relative advantage of optimal hypothesis
-Claity <- 0.5
+Clarity <- 0.5
 
 # Random variables corresponding to each hypothesis
 Atrue <- function() {
