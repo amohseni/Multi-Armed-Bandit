@@ -100,7 +100,7 @@ while (Converged == FALSE) {
   # Print matrix of current beliefs
   print(BeliefMatrix)
   
-  # History the actions taken
+  # History of the actions taken
   HistoryHypothesis <-
     append(HistoryHypothesis, Hypothesis, after = length(HistoryHypothesis))
   HistoryResult <-
