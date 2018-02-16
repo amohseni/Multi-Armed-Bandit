@@ -18,7 +18,7 @@ HypothesesPrior <-
 # Ratio for discounting value of next round payoffs
 FutureDiscountRatio <- b <- 0.99
 # Relative advantage of optimal hypothesis
-Clarity <- 0.5
+Clarity <- 0.1
 
 # Random variables corresponding to each hypothesis
 Atrue <- function() {
@@ -110,7 +110,7 @@ while (Converged == FALSE) {
   if (t > 30) {
     # If the process has repeated enought times, we takes this to indicate convergence
     RecentHistory <- HistoryHypothesis[(t - 20):t]
-    if (length(unique(RecentHistory)) == 1) {
+    if (length(unique(RecentHistory)) == 1 | t == 1000) {
       Converged <- TRUE
       # If we have converged, then compute final probabilies
       for (i in 1:n) {
@@ -118,18 +118,18 @@ while (Converged == FALSE) {
         BeliefMatrix[i, ] <- BeliefMatrix[i, ] / rowTotal
       }
       FinalHypothesis <- which.max(BeliefMatrix[, 1])
+      # Print out the final history of learning,
+      # consisting of hypotheses test and results obtained
+      print("History of hypotheses tested:")
+      print(HistoryHypothesis)
+      print("History of results obtained:")
+      print(HistoryResult)
       # Print out the final hypothesis, and posterior beliefs
       print(paste("Learning has converged to: HYPOTHESIS ",
                   FinalHypothesis,
                   sep = ""))
       print("Posterior probabilites:")
       print(BeliefMatrix)
-      # And print out the final history of learning,
-      # consisting of hypotheses test and results obtained
-      print("History of hypotheses tested:")
-      print(HistoryHypothesis)
-      print("History of results obtained:")
-      print(HistoryResult)
     }
   }
   
