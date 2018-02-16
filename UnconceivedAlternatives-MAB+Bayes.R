@@ -4,13 +4,17 @@
 # aydinmohseni@gmail.com
 
 
+### LIBRARIES & PACKAGES
+library(ggplot2)
+library(reshape2)
+
 ### GLOBAL VARIABLES
 # Duration of simulation,
 # in terms if number of scientific hypothesis tests decided
-Duration <- 100
+Duration <- 10
 
 # Theories
-TheoriesNum <- 3
+TheoriesNum <- 5
 TheoriesStrengthOfPriors <- 10
 TheoriesPriors <- rep(TheoriesStrengthOfPriors, times = TheoriesNum)
 # Matrix of hyperparameters r_1,r_2,...,r_t for Dir(r_1,r_2,...,r_n) prior over theories
@@ -18,8 +22,8 @@ TheoriesPriors <- rep(TheoriesStrengthOfPriors, times = TheoriesNum)
 # Hypotheses
 HypothesesNum <- TheoriesNum # Number of hypotheses
 HypothesesStrengthOfPriors <-
-  TheoriesStrengthOfPriors # Strenght of prior beliefs
-HypothesesPriors <-
+  TheoriesStrengthOfPriors # Strenght of prior beliefsa
+HypothesesPriors <- # Matrix of hyperparameters p,q for Beta(p,q) priors over hypotheses
   matrix(
     data = c(
       HypothesesStrengthOfPriors,
@@ -28,7 +32,7 @@ HypothesesPriors <-
     nrow = HypothesesNum,
     ncol = 2,
     byrow = TRUE
-  ) # Matrix of hyperparameters p,q for Beta(p,q) priors over hypotheses
+  ) 
 # Ratio for discounting value of next round payoffs
 FutureDiscountRatio <- b <- 0.99
 # Relative advantage of optimal hypothesis
@@ -94,11 +98,13 @@ TheoriesBeliefMatrix <-
     byrow = TRUE
   )
 # Populate the first row of the theories belief matrix with the prior beliefs
-TheoriesBeliefMatrix[1,] <- TheoriesBeliefVector
+TheoriesBeliefMatrix[1,] <- TheoriesBeliefVector <- TheoriesPriors
+HypothesesBeliefMatrix <- HypothesesPriors
 
 for (round in 1:Duration) {
   # Matrix of Beta(p_i,q_i) beliefs about each hypothesis i=1,2,...,n at a given time t
-  HypothesesBeliefMatrix <- HypothesesPriors
+  HypothesesBeliefMatrix[, 1] <- TheoriesBeliefVector
+  HypothesesBeliefMatrix[, 2] <- sum(TheoriesBeliefVector)
   
   # Initiate relevant variables
   HistoryHypothesis <- c() # Vector of hypotheses tested
@@ -143,12 +149,13 @@ for (round in 1:Duration) {
         Converged <- TRUE
         
         # If we have CONVERGED, then compute final probabilies
+        HypothesesFinalBeliefMatrix <- HypothesesBeliefMatrix  
         for (i in 1:n) {
-          rowTotal <- sum(HypothesesBeliefMatrix[i, ])
-          HypothesesBeliefMatrix[i, ] <-
-            HypothesesBeliefMatrix[i, ] / rowTotal
+          rowTotal <- sum(HypothesesFinalBeliefMatrix[i, ])
+          HypothesesFinalBeliefMatrix[i, ] <-
+            HypothesesFinalBeliefMatrix[i, ] / rowTotal
         }
-        FinalHypothesis <- which.max(HypothesesBeliefMatrix[, 1])
+        FinalHypothesis <- which.max(HypothesesFinalBeliefMatrix[, 1])
         
         # UPDATE BELIEF over the higher-level THEORIES
         TheoriesBeliefVector[FinalHypothesis] <- TheoriesBeliefVector[FinalHypothesis] + 1
@@ -205,5 +212,13 @@ for (round in 1:Duration) {
               FinalBelief,
               sep = ""))
 }
+
+# Plot results 
+df <- data.frame(c(0:Duration), TheoriesFinalBeliefMatrix)
+dfMelt <- melt(df, id.vars = 1)
+colnames(dfMelt) <- c("Time", "Theory", "Belief")
+ggplot(data = dfMelt, aes(x = Time, y = Belief)) +
+  geom_line(aes(group = Theory, color = Theory), size = 1)
+
 
 ### EOD
