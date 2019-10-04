@@ -11,7 +11,7 @@ library(reshape2)
 ### GLOBAL VARIABLES
 # Duration of simulation,
 # in terms if number of scientific hypothesis tests decided
-Duration <- 10
+Duration <- 100
 
 # Theories
 TheoriesNum <- 5
@@ -98,7 +98,7 @@ TheoriesBeliefMatrix <-
     byrow = TRUE
   )
 # Populate the first row of the theories belief matrix with the prior beliefs
-TheoriesBeliefMatrix[1,] <- TheoriesBeliefVector <- TheoriesPriors
+TheoriesBeliefMatrix[1,] <- TheoriesBeliefVector
 HypothesesBeliefMatrix <- HypothesesPriors
 
 for (round in 1:Duration) {
